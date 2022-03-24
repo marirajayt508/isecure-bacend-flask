@@ -1,0 +1,24 @@
+import pymongo
+
+myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb")
+mydb = myclient["PrdConfig"]
+BaicDetails = mydb["BasicDetails"]
+KeyDetails = mydb["KeyDetails"]
+UserDetails = mydb["UserDetails"]
+
+def BasicDetails(name,password,key):
+   Basicdict = { "name": name, "password": password, "key" : key }
+   BaicDetails.insert_one(Basicdict)
+   print("Basic Details inserted")
+   
+def Keydetails(key):
+   Keydict = { "name": "Mariraja", "Selvaraja": "Highway 37" }
+   KeyDetails.insert_one(Keydict)
+   print("Key Details inserted")
+
+def UserDetails(name,firstname,lastname,code,phonenumber,email,password,key):
+   userdict = { "name": "Mariraja", "Selvaraja": "Highway 37" }
+   UserDetails.insert_one(Userdict)
+   print("User Details inserted")
+   
+BasicDetails("Jothika Selvaraja","jothikaselvaraj2002@gmail.com","11232434")
