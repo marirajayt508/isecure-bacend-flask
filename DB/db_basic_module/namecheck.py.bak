@@ -1,0 +1,6 @@
+import DB.db_basic_module.connection as connection
+import Modules.KeySecurity.isecure as keysecure
+
+UserDetails = connection.keydb()
+
+def Namecheck():

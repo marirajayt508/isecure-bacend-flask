@@ -1,9 +1,13 @@
 import json
+import math, random
 import Modules.Encryption.Enmachine as Encryptor
 import Modules.Decryption.Demachine as Decryptor
 import Modules.KeySecurity.isecure as isecure
 import Modules.mail.mailer as mailer
 import Modules.Otp.otp as otp
+import DB.db_basic_module.insert as insert
+import DB.db_basic_module.check as check
+import DB.db_basic_module.user_reg_check as users
 def Index () :
     return "This is Index page"
 
@@ -37,7 +41,11 @@ def Encryption (data) :
     return json.dumps(Encryption)
     
 def otps():
-    otp.otp()
+      digits = "0123456789"
+      OTP = ""
+      for i in range(6):
+        OTP += digits[math.floor(random.random() * 10)]
+      return OTP
 
 def otpmailer(email,otp):
     mailer.otpmail(email,otp)
@@ -58,3 +66,19 @@ def Decryption (key1,key2,key3,endata) :
 
     Decryption = {'data' : level1_data}
     return json.dumps(Decryption)
+
+def BasicInsert(name,password,key):
+    insert.Basicdetails(name,password,key)
+
+def KeyInsert(key):
+    insert.Keydetails(key)
+
+def UserInsert(name,firstname,lastname,code,phno,email,password,key):
+    insert.Userdetails(name,firstname,lastname,code,phno,email,password,key)
+
+def check_key(key) :
+    return check.check_keys(key)
+    
+def check_name(name) :
+    return users.Namecheck(name)
+    

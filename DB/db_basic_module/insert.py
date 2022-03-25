@@ -6,7 +6,7 @@ KeyDetails = connections.keydb()
 UserDetails = connections.userdb()
 
 def Basicdetails(name,password,key):
-   Basicdict = { "name": name, "password": password, "key" : key }
+   Basicdict = { "email": name, "password": password, "key" : key }
    BaicDetails.insert_one(Basicdict)
    print("Basic Details inserted")
    

@@ -15,8 +15,13 @@ def ping():
 @app.route('/Register',methods = ['POST','GET'])
 def Register():
     data = request.get_json()
-    Flow.keypassmailer("marirajayt508@gmail.com",Flow.Encryption(data['key']))
+    Flow.keypassmailer(data['email'],Flow.Encryption(data['key']))
     return Flow.Encryption(data['key'])
+    
+@app.route('/Getkey',methods = ['POST','GET'])
+def getkey():
+    data = request.get_json()
+    return Flow.get_key({"email" : "marirajayt508@gmail.com"})
     
 @app.route('/Otp',methods = ['POST','GET'])
 def otp():
@@ -30,6 +35,18 @@ def Encryption():
     data = request.get_json()
     #return jsonify({'data':data['key']})
     return Flow.Encryption(data['key'])
+  
+@app.route('/Check',methods = ['POST','GET'])  
+def Name_check():
+    data = request.get_json()
+    #return jsonify({'data':data['key']})
+    if Flow.check_name(data) :
+        msg = "false"
+    else :
+        msg = "true"
+    
+    return msg
+
 
 @app.route('/Decryption',methods = ['POST','GET'])
 def Decryption():

@@ -7,6 +7,9 @@ import Modules.mail.mailer as mailer
 import Modules.Otp.otp as otp
 import DB.db_basic_module.insert as insert
 import DB.db_basic_module.check as check
+import DB.db_basic_module.user_reg_check as users
+import DB.db_basic_module.getkey as keys
+
 def Index () :
     return "This is Index page"
 
@@ -77,3 +80,10 @@ def UserInsert(name,firstname,lastname,code,phno,email,password,key):
 
 def check_key(key) :
     return check.check_keys(key)
+    
+def check_name(name) :
+    return users.Namecheck(name)
+    
+def get_key(key) :
+    return keys.getkey(key)
+    
