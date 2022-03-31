@@ -5,9 +5,15 @@ import Modules.Decryption.Demachine as Decryptor
 import Modules.KeySecurity.isecure as isecure
 import Modules.mail.mailer as mailer
 import Modules.Otp.otp as otp
+import Modules.QrLogin.session as login
+import Modules.Otp.captha as cap
 import DB.db_basic_module.insert as insert
 import DB.db_basic_module.check as check
 import DB.db_basic_module.user_reg_check as users
+import DB.db_basic_module.getkey as keys
+import DB.db_basic_module.get_user_info as user_info
+import DB.db_basic_module.loginsession as login_sess
+
 def Index () :
     return "This is Index page"
 
@@ -40,10 +46,10 @@ def Encryption (data) :
      }
     return json.dumps(Encryption)
     
-def otps():
+def otps(n):
       digits = "0123456789"
       OTP = ""
-      for i in range(6):
+      for i in range(n):
         OTP += digits[math.floor(random.random() * 10)]
       return OTP
 
@@ -81,4 +87,55 @@ def check_key(key) :
     
 def check_name(name) :
     return users.Namecheck(name)
+    
+def get_key(key) :
+    return keys.getkey(key)
+    
+def capthas() :
+    return cap.captha()
+    
+def session_active(key,code,otp):
+    return login.session(key,code,otp)
+    
+def session_check(key):
+    return login.check_session(key)
+    
+def session_mail(key):
+    return login.get_session(key)
+ 
+def session_name(key):
+    return login.get_name(key) 
+    
+def session_otp(key):
+    return login.get_code(key)
+    
+def session_key(code) :
+    return login.get_session_key(code)
+    
+def session_time(code) :
+    return login.get_session_time(code)
+    
+def session_deactive(key):
+    return login.del_session(key)
+    
+def numcheck(a,b) :
+    if a is b :
+       return False
+    else :
+       return True
+
+def user_info_get(key):
+    return user_info.Fetch_User_Info(key)
+
+def login_info(datas):
+    return login_sess.login_sessiondata(datas)
+    
+def login_data_validate(key):
+    return login_sess.login_get_sessiondata_validate(key)
+    
+def login_data(key):
+    return login_sess.login_get_sessiondata(key)
+    
+def login_data_navi(key):
+    return login_sess.login_get_sessiondata_navi(key)
     

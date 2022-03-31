@@ -1,0 +1,42 @@
+import pymongo
+
+myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb")
+
+mydb = myclient["PrdConfig"]
+
+logdb = myclient["LoginDb"]
+
+qr_session = mydb["QrSession"]
+
+user_session = mydb["UserDetails"]
+
+login_session = logdb["LoginLog"]
+
+def login_sessiondata(datas):
+    login_session.insert_one(datas)
+    return ""
+    
+def login_get_sessiondata_validate_info(key):
+    if "LoginDb" in myclient.list_database_names():
+        if "LoginLog" in logdb.list_collection_names():
+            for i in login_session.find({"key" : key}) :
+                if i['key'] == key :
+                   return True
+                else:
+                   return False
+        else:
+           return False
+    else:
+        return False
+
+def login_get_sessiondata(key):
+
+     return login_session.find({'key' : key})
+ 
+
+def login_get_sessiondata_navi(key):
+     count = False
+     for i in login_session.find({'key' : key}) :
+          count = True
+          
+     return count

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "jwt-encode": "^1.0.1",
+    "jwt-simple": "^0.5.6"
+  }
+}

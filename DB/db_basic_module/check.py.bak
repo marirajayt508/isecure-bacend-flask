@@ -18,8 +18,6 @@ def check_keys(key):
               
               print("-- KEY Found -- "+key)
               return True
-          elif i['key'] == None:
-              return False
           else :
               print("-- KEY Not Found -- "+key)
               return False

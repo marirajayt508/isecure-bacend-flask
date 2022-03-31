@@ -4,6 +4,9 @@ import Modules.KeySecurity.isecure as keysecure
 UserDetails = connection.userdb()
 
 def getkey(query):
-     
-    return UserDetails.find(query)['key']
+    key = ""
+    print("This is Query "+str(query))
+    for i in UserDetails.find(query) :
+          return i['key']
         
+    return key

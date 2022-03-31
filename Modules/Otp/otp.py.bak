@@ -6,4 +6,3 @@ def otp():
         OTP += digits[math.floor(random.random() * 10)]
   return OTP
   
-print(otp ())

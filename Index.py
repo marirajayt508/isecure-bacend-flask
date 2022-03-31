@@ -1,11 +1,16 @@
-from flask import Flask,jsonify, request
+from flask import Flask,jsonify, request, session, redirect, render_template
+from localStoragePy import localStoragePy
+from flask_session import Session
 from flask_cors import CORS
+import random
 app = Flask(__name__)
 import Flow
 
+status = "false"
+
 @app.route('/',methods = ['POST','GET'])
 def Index():
-    return "This is Index" 
+    return jsonify({'msg' : "success"})
 
 @app.route('/ping',methods = ['POST','GET'])
 def ping():
@@ -21,15 +26,176 @@ def Register():
 @app.route('/Getkey',methods = ['POST','GET'])
 def getkey():
     data = request.get_json()
-    return Flow.get_key({"email" : "marirajayt508@gmail.com"})
+    return Flow.get_key(data['email'])
     
+#Start Session
+@app.route('/StartSession',methods = ['POST','GET'])
+def Sessionstart ():
+    data = request.get_json()
+    
+    qrcode = Flow.capthas()
+    
+    check = Flow.session_active(data['key'],qrcode,Flow.otps(2))
+    
+    return jsonify({'qr' : qrcode , 'status' : check})
+    
+    
+#Check Session
+@app.route('/CheckSession',methods = ['POST','GET'])
+def Sessioncheck():
+    data = request.get_json()
+    return str(Flow.session_check(data['key']))
+    
+#End Session
+@app.route('/EndSession',methods = ['POST','GET'])
+def Sessionend():
+    data = request.get_json()
+    return str(Flow.session_deactive(data))
+    
+#MobApp Check Session
+@app.route('/AppCheckSession',methods = ['POST','GET'])
+def Appsessioncheck():
+    data = request.form['key']
+    #return str(Flow.session_check(data['key']))
+    return jsonify({'msg' : str(Flow.session_check(data))})
+ 
+#MobApp Send Email 
+@app.route('/AppSendEmailCode',methods = ['POST','GET'])
+def Appsendemail():
+
+    data = request.form['key']
+    
+    key = str(Flow.session_key(data))
+    
+    mail =str(Flow.session_mail(key))
+    
+    name = str(Flow.session_name(key))
+    
+    otp = str(Flow.session_otp(data))
+    
+    time = str(Flow.session_time(key))
+    
+    Flow.otpmailer(mail,otp)
+    
+    return jsonify({'msg' : "Success", 'time' : time, 'name' : name, 'otp' : otp})
+    
+#MobApp Choose Session
+@app.route('/AppChooseSessionOtp',methods = ['POST','GET'])
+def Appsessionchoose():
+    data = request.form['code']
+    otp_random = [Flow.otps(2),Flow.otps(2),Flow.session_otp(data)]
+    class_random = ["btn btn-secondary","btn btn-success","btn btn-warning"]
+    num = [0,1,2]
+    otp1 = random.choice(num)
+    
+    chs = random.randrange(2)
+    
+    if chs == 0 :
+       if otp1 in num :
+          num.remove(otp1) 
+
+       otp2 = num[0]   
+    
+       if otp2 in num :
+          num.remove(otp2)
+       
+       otp3 = num[0] 
+    
+    else :
+       if otp1 in num :
+          num.remove(otp1) 
+
+       otp2 = num[0]   
+    
+       if otp2 in num :
+          num.remove(otp2)
+       
+       otp3 = num[0]     
+
+    return jsonify({'otp1' : {'otp_code':otp_random[otp1],'otp_class' : class_random[otp1]},'otp2' :{'otp_code':otp_random[otp2],'otp_class' : class_random[otp2]},'otp3' : {'otp_code':otp_random[otp3],'otp_class' : class_random[otp3]}})
+
+#MobApp Ocode
+@app.route('/Ocode',methods = ['POST','GET'])
+def Appcheckocode():
+    data = request.form['status']
+    code = request.form['code']
+    device = request.form['device']
+    time = request.form['time']
+    key = str(Flow.session_key(code))
+    user_info = Flow.user_info_get(key)
+    if data == "True":
+       
+       udata = {
+       'key' : key,
+       'user_datas' : user_info,
+       'time' : time,
+       'device' : device,
+       'LoginStatus' : "true"
+       }
+       
+       Flow.login_info(udata)
+       
+       status = "true"
+   
+       return data
+    else :
+       
+       status = "false"
+       
+       print (status)
+   
+       return data
+
 @app.route('/Otp',methods = ['POST','GET'])
 def otp():
     data = request.get_json()
-    otp_val = Flow.otps()
+    otp_val = Flow.otps(6)
     Flow.otpmailer(data['email'],otp_val)
     return otp_val
     
+@app.route('/LoginCheck',methods = ['POST','GET'])  
+def Logincheck():
+    data = request.get_json()
+    user_obj = Flow.login_data(data['key'])
+    user_obj_test = Flow.login_data_validate(data['key'])
+    if user_obj_test :
+   
+        send_obj = {
+            'key' : user_obj['key'],
+            'name' : user_obj['user_datas']['name'],
+            'firstname' : user_obj['user_datas']['firstname'],
+            'lastname' : user_obj['user_datas']['lastname'],
+            'code' : user_obj['user_datas']['code'],
+            'phonenumber' : user_obj['user_datas']['phonenumber'],
+            'email' : user_obj['user_datas']['email'],
+            'password' : user_obj['user_datas']['password'],
+            'time' : user_obj['time'],
+            'device' : user_obj['device'],
+            'loginstatus': user_obj['LoginStatus'] 
+        }
+
+    else :
+    
+       send_obj = {
+       'loginstatus': 'false' 
+       }
+    
+
+    return send_obj
+ 
+@app.route('/LoginCheckNavi',methods = ['POST','GET'])  
+def Loginchecknavi():
+    data = request.get_json()
+    user_obj = Flow.login_data_validate(data['key'])
+   
+    if user_obj :
+       return jsonify({'status' : "true"})
+    else :
+ 
+       return jsonify({'status' : "true"})
+     
+ 
+ 
 @app.route('/Encryption',methods = ['POST','GET'])
 def Encryption():
     data = request.get_json()
@@ -46,6 +212,19 @@ def Name_check():
         msg = "true"
     
     return msg
+    
+@app.route('/Captha',methods = ['POST','GET'])  
+def captha():
+    data = request.get_json()
+    #return jsonify({'data':data['key']})
+ 
+    return Flow.capthas()
+  
+@app.route('/KeyCheck',methods = ['POST','GET'])   
+def Keycheck():
+    data = request.get_json()
+    
+    return str(Flow.check_key(data['key']))
 
 
 @app.route('/Decryption',methods = ['POST','GET'])
@@ -88,7 +267,10 @@ def InsertBasicLogin():
     
 if __name__ == "__main__" :
       CORS(app)
-      app.run()
+      app.config["SESSION_PERMANENT"] = False
+      app.config["SESSION_TYPE"] = "filesystem"
+      Session(app)
+      app.run(host= '192.168.211.37')
 
 '''data = request.get_json()
     col = ['BaicDetails','KeyDetails','UserDetails']
